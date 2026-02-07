@@ -1,1 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nigerian Rural Sociology Quiz</title>
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: #f0f4f8;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+  }
+  .quiz-container {
+    background: #fff;
+    padding: 25px 35px;
+    border-radius: 15px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+    max-width: 700px;
+    width: 100%;
+    position: relative;
+  }
+  h1 {
+    text-align: center;
+    color: #2c3e50;
+    margin-bottom: 20px;
+  }
+  .question {
+    font-weight: bold;
+    font-size: 1.2em;
+    margin-bottom: 15px;
+  }
+  .options button {
+    display: block;
+    width: 100%;
+    margin: 8px 0;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    background: #3498db;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1em;
+    transition: 0.2s;
+  }
+  .options button:hover {
+    background: #2980b9;
+  }
+  .feedback {
+    margin-top: 12px;
+    font-weight: bold;
+    font-size: 1.1em;
+    display: flex;
+    align-items: center;
+  }
+  .feedback span {
+    margin-left: 10px;
+  }
+  .timer {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-weight: bold;
+    color: #e74c3c;
+  }
+  .loader {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #3498db;
+    border-top: 5px solid #fff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 20px auto;
+    display: none;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg);}
+    100% { transform: rotate(360deg);}
+  }
+  .score {
+    text-align: center;
+    font-size: 1.3em;
+    margin-top: 20px;
+    color: #27ae60;
+  }
+</style>
+</head>
+<body>
 
+<div class="quiz-container">
+  <h1>Nigerian Rural Sociology Quiz</h1>
+  <div class="timer" id="timer">20s</div>
+  <div id="quiz">
+      <div class="question" id="question"></div>
+      <div class="options" id="options"></div>
+      <div class="feedback" id="feedback"></div>
+      <div class="loader" id="loader"></div>
+  </div>
+  <div class="score" id="score"></div>
+</div>
+
+<script>
+const questions = [
+    {question: "1. Rural sociology is the study of?", options:["Urban behavior","Human life in rural areas","Industrial management","Traffic systems"], answer:"Human life in rural areas"},
+    {question: "2. Rural communities typically have?", options:["High population density","Low population density","Skyscrapers","Factories"], answer:"Low population density"},
+    {question: "3. Which is a rural social institution?", options:["Family","Stock market","Airport","Highway"], answer:"Family"},
+    {question: "4. Education in rural areas focuses on?", options:["Practical farming skills","Stock trading","Software engineering","Automobile repair"], answer:"Practical farming skills"},
+    {question: "5. Religion in rural areas influences?", options:["Fashion trends","Social norms and cohesion","Urban planning","Internet usage"], answer:"Social norms and cohesion"},
+    {question: "6. Rural economic institutions govern?", options:["Currency exchange","Production, exchange, and consumption","Movie industry","Air travel"], answer:"Production, exchange, and consumption"},
+    {question: "7. Rural development aims to?", options:["Increase urban skyscrapers","Improve rural social and economic conditions","Export oil","Build airports"], answer:"Improve rural social and economic conditions"},
+    {question: "8. The rural-urban continuum illustrates?", options:["A strict rural/urban division","A spectrum between rural and urban areas","Only urban growth","Only rural villages"], answer:"A spectrum between rural and urban areas"},
+    {question: "9. Factors responsible for rural-urban differences include?", options:["Population, economy, infrastructure, education","Weather only","Sports only","Languages only"], answer:"Population, economy, infrastructure, education"},
+    {question: "10. Bureaucratically means?", options:["Informally","With rules and hierarchy","Without rules","By chance"], answer:"With rules and hierarchy"},
+    {question: "11. Rural settlements usually have how many households?", options:["100-200","1000-2000","10-20","5000+"], answer:"100-200"},
+    {question: "12. Modernization affects rural communities by?", options:["Changing social and economic structures","Reducing literacy","Increasing poverty","Destroying farms"], answer:"Changing social and economic structures"},
+    {question: "13. Rural communities are typically isolated because?", options:["Low infrastructure and remote location","They like isolation","They have skyscrapers","They are urban centers"], answer:"Low infrastructure and remote location"},
+    {question: "14. Family institutions in rural areas provide?", options:["Child-rearing and labor distribution","Air traffic control","Urban planning","Stock market management"], answer:"Child-rearing and labor distribution"},
+    {question: "15. Youth involvement in rural agriculture is important because?", options:["Encourages innovation and sustainability","It reduces urban jobs","It increases traffic","It builds skyscrapers"], answer:"Encourages innovation and sustainability"},
+    {question: "16. Social institutions include?", options:["Family, education, religion, economy","Cars, buses, planes","Factories, offices, airports","Television, radio, internet"], answer:"Family, education, religion, economy"},
+    {question: "17. Examples of rural economic activities include?", options:["Farming, trading, cooperatives","Cinema, theatre, fashion","Airline management","Urban banking"], answer:"Farming, trading, cooperatives"},
+    {question: "18. Limited infrastructure in rural areas leads to?", options:["Post-harvest losses and poor market access","Better connectivity","High tech growth","Skyscraper development"], answer:"Post-harvest losses and poor market access"},
+    {question: "19. Religion affects rural life by?", options:["Shaping moral values and dispute resolution","Designing roads","Managing banks","Teaching software"], answer:"Shaping moral values and dispute resolution"},
+    {question: "20. Education impacts rural development by?", options:["Equipping youth with knowledge and farming skills","Only teaching city jobs","Building malls","Managing airports"], answer:"Equipping youth with knowledge and farming skills"}
+];
+
+let current = 0;
+let score = 0;
+let timer;
+let timeLeft = 20;
+
+function showQuestion(){
+    if(current >= questions.length){
+        document.getElementById("quiz").style.display = "none";
+        document.getElementById("score").innerHTML = `🎉 Quiz Completed! Your Score: ${score} / ${questions.length}`;
+        return;
+    }
+    timeLeft = 20;
+    document.getElementById("timer").textContent = `${timeLeft}s`;
+    clearInterval(timer);
+    timer = setInterval(countdown, 1000);
+
+    document.getElementById("question").textContent = questions[current].question;
+    const optionsDiv = document.getElementById("options");
+    optionsDiv.innerHTML = "";
+    questions[current].options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.textContent = opt;
+        btn.onclick = () => checkAnswer(opt);
+        optionsDiv.appendChild(btn);
+    });
+    document.getElementById("feedback").textContent = "";
+    document.getElementById("loader").style.display = "none";
+}
+
+function countdown(){
+    timeLeft--;
+    document.getElementById("timer").textContent = `${timeLeft}s`;
+    if(timeLeft <= 0){
+        clearInterval(timer);
+        showFeedback(false, `⏰ Time's up! Correct answer: ${questions[current].answer}`);
+    }
+}
+
+function checkAnswer(selected){
+    clearInterval(timer);
+    const isCorrect = selected === questions[current].answer;
+    showFeedback(isCorrect);
+}
+
+function showFeedback(isCorrect, msg=null){
+    const feedbackDiv = document.getElementById("feedback");
+    const loader = document.getElementById("loader");
+    loader.style.display = "block";
+    feedbackDiv.textContent = "";
+    setTimeout(() => {
+        loader.style.display = "none";
+        if(msg){
+            feedbackDiv.innerHTML = msg;
+        } else if(isCorrect){
+            feedbackDiv.innerHTML = "✅ Correct!";
+            score++;
+        } else {
+            feedbackDiv.innerHTML = `❌ Wrong! Correct answer: ${questions[current].answer}`;
+        }
+        current++;
+        setTimeout(showQuestion, 1200);
+    }, 800);
+}
+
+showQuestion();
+</script>
+
+</body>
+  </html>
